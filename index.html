@@ -1,0 +1,1100 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MEM — 3D Horror</title>
+
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#050507;
+    font-family:Arial,Tahoma,sans-serif;
+}
+
+#game{
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+#ui{
+    position:absolute;
+    top:20px;
+    left:20px;
+    z-index:10;
+    color:white;
+    background:rgba(0,0,0,.45);
+    padding:15px 18px;
+    border-radius:12px;
+    backdrop-filter:blur(8px);
+    pointer-events:none;
+}
+
+#title{
+    font-size:22px;
+    font-weight:bold;
+    letter-spacing:4px;
+}
+
+#hint{
+    margin-top:8px;
+    font-size:13px;
+    opacity:.8;
+}
+
+#message{
+    position:absolute;
+    bottom:35px;
+    left:50%;
+    transform:translateX(-50%);
+    color:white;
+    background:rgba(0,0,0,.65);
+    padding:14px 24px;
+    border-radius:12px;
+    z-index:20;
+    opacity:0;
+    transition:.4s;
+    text-align:center;
+    pointer-events:none;
+}
+
+#start{
+    position:absolute;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle,#29252d 0%,#050507 70%);
+    color:white;
+    text-align:center;
+}
+
+#startBox{
+    max-width:500px;
+    padding:30px;
+}
+
+#startBox h1{
+    font-size:55px;
+    letter-spacing:12px;
+    margin:0 0 10px;
+}
+
+#startBox p{
+    line-height:1.8;
+    opacity:.8;
+}
+
+#startButton{
+    border:0;
+    padding:15px 35px;
+    border-radius:12px;
+    background:#e5d2d9;
+    color:#211a20;
+    font-size:17px;
+    cursor:pointer;
+}
+
+#scare{
+    position:absolute;
+    inset:0;
+    z-index:200;
+    background:#000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+
+#scare.show{
+    display:flex;
+    animation:flash .12s infinite;
+}
+
+#scareFace{
+    width:260px;
+    height:340px;
+    position:relative;
+    transform:scale(1.4);
+}
+
+.faceHair{
+    position:absolute;
+    inset:0;
+    background:#09070b;
+    border-radius:50%;
+}
+
+.face{
+    position:absolute;
+    width:190px;
+    height:240px;
+    left:35px;
+    top:55px;
+    border-radius:50%;
+    background:#c9aaa1;
+}
+
+.eye{
+    position:absolute;
+    top:95px;
+    width:30px;
+    height:50px;
+    background:#030303;
+    border-radius:50%;
+}
+
+.eye.one{left:35px}
+.eye.two{right:35px}
+
+.mouth{
+    position:absolute;
+    left:60px;
+    top:170px;
+    width:70px;
+    height:50px;
+    background:#050505;
+    border-radius:0 0 40px 40px;
+}
+
+#scareText{
+    position:absolute;
+    bottom:45px;
+    color:white;
+    font-size:25px;
+}
+
+@keyframes flash{
+    0%{filter:brightness(4)}
+    50%{filter:brightness(.2)}
+    100%{filter:brightness(1)}
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="ui">
+        <div id="title">MEM</div>
+        <div id="day">اليوم 1</div>
+        <div id="hint">
+            WASD للحركة — الماوس للنظر
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <div id="start">
+        <div id="startBox">
+            <h1>MEM</h1>
+            <p>
+                في البداية، كل شيء طبيعي.<br>
+                لكن لا تثق بكل شيء تراه.
+            </p>
+
+            <button id="startButton">
+                ابدأ اللعبة
+            </button>
+        </div>
+    </div>
+
+    <div id="scare">
+        <div id="scareFace">
+
+            <div class="faceHair"></div>
+
+            <div class="face">
+                <div class="eye one"></div>
+                <div class="eye two"></div>
+                <div class="mouth"></div>
+            </div>
+
+        </div>
+
+        <div id="scareText">
+            MEM
+        </div>
+    </div>
+
+</div>
+
+
+<script type="module">
+
+import * as THREE
+from
+'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+
+
+/* =====================================================
+   BASIC SETUP
+===================================================== */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x17151b);
+
+scene.fog =
+    new THREE.Fog(
+        0x17151b,
+        10,
+        42
+    );
+
+
+const camera =
+    new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100
+    );
+
+camera.position.set(
+    0,
+    1.7,
+    8
+);
+
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio,2)
+);
+
+renderer.shadowMap.enabled = true;
+
+document
+    .getElementById("game")
+    .appendChild(renderer.domElement);
+
+
+/* =====================================================
+   LIGHTS
+===================================================== */
+
+const ambient =
+    new THREE.HemisphereLight(
+        0xffead7,
+        0x443d4a,
+        2
+    );
+
+scene.add(ambient);
+
+
+const lampLight =
+    new THREE.PointLight(
+        0xffd29a,
+        8,
+        15
+    );
+
+lampLight.position.set(
+    0,
+    3.5,
+    1
+);
+
+lampLight.castShadow = true;
+
+scene.add(lampLight);
+
+
+/* =====================================================
+   MATERIALS
+===================================================== */
+
+function material(color){
+
+    return new THREE.MeshStandardMaterial({
+        color:color,
+        roughness:.8
+    });
+
+}
+
+
+/* =====================================================
+   ROOM
+===================================================== */
+
+function box(
+    x,y,z,
+    sx,sy,sz,
+    color
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                sx,sy,sz
+            ),
+            material(color)
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    scene.add(mesh);
+
+    return mesh;
+}
+
+
+/* FLOOR */
+
+box(
+    0,
+    0,
+    0,
+    24,
+    .2,
+    24,
+    0x795b4d
+);
+
+
+/* WALLS */
+
+box(
+    0,
+    4,
+    -12,
+    24,
+    8,
+    .3,
+    0xcdbdb1
+);
+
+box(
+    -12,
+    4,
+    0,
+    .3,
+    8,
+    24,
+    0xcdbdb1
+);
+
+box(
+    12,
+    4,
+    0,
+    .3,
+    8,
+    24,
+    0xcdbdb1
+);
+
+
+/* BACK WALL DETAIL */
+
+box(
+    0,
+    4,
+    11.8,
+    24,
+    8,
+    .3,
+    0xb9a9a0
+);
+
+
+/* =====================================================
+   BED
+===================================================== */
+
+box(
+    6,
+    1,
+    -7,
+    5,
+    1.3,
+    3,
+    0x62483f
+);
+
+box(
+    6,
+    1.7,
+    -7,
+    4.7,
+    .5,
+    2.7,
+    0xe9ded5
+);
+
+box(
+    6,
+    2.1,
+    -7.6,
+    2,
+    .35,
+    1.7,
+    0xf7f0e9
+);
+
+box(
+    6,
+    1.9,
+    -6.4,
+    4.5,
+    .35,
+    1.5,
+    0x788f98
+);
+
+
+/* =====================================================
+   DESK
+===================================================== */
+
+box(
+    -6,
+    1.5,
+    -6,
+    4,
+    .35,
+    1.5,
+    0x65493f
+);
+
+box(
+    -7.6,
+    .7,
+    -6,
+    .25,
+    1.4,
+    .25,
+    0x543d36
+);
+
+box(
+    -4.4,
+    .7,
+    -6,
+    .25,
+    1.4,
+    .25,
+    0x543d36
+);
+
+
+/* =====================================================
+   WINDOW
+===================================================== */
+
+const windowGlass =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            5,
+            3.5,
+            .15
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x79a4ba,
+            roughness:.2,
+            metalness:.1
+        })
+    );
+
+windowGlass.position.set(
+    0,
+    4,
+    -11.75
+);
+
+scene.add(windowGlass);
+
+
+/* WINDOW FRAME */
+
+box(
+    -2.5,
+    4,
+    -11.55,
+    .25,
+    4,
+    .25,
+    0xf0e7df
+);
+
+box(
+    2.5,
+    4,
+    -11.55,
+    .25,
+    4,
+    .25,
+    0xf0e7df
+);
+
+box(
+    0,
+    5.9,
+    -11.55,
+    5,
+    .25,
+    .25,
+    0xf0e7df
+);
+
+box(
+    0,
+    2.1,
+    -11.55,
+    5,
+    .25,
+    .25,
+    0xf0e7df
+);
+
+
+/* =====================================================
+   RUG
+===================================================== */
+
+const rug =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            3.5,
+            3.5,
+            .08,
+            48
+        ),
+        material(0xa98589)
+    );
+
+rug.rotation.x =
+    Math.PI / 2;
+
+rug.position.set(
+    0,
+    .12,
+    1
+);
+
+scene.add(rug);
+
+
+/* =====================================================
+   MEM
+===================================================== */
+
+const mem =
+    new THREE.Group();
+
+mem.position.set(
+    0,
+    0,
+    -3
+);
+
+scene.add(mem);
+
+
+/* body */
+
+const memBody =
+    new THREE.Mesh(
+        new THREE.CapsuleGeometry(
+            .65,
+            1.2,
+            8,
+            16
+        ),
+        material(0x8eaca6)
+    );
+
+memBody.position.y =
+    1.1;
+
+memBody.castShadow = true;
+
+mem.add(memBody);
+
+
+/* head */
+
+const memHead =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .7,
+            32,
+            32
+        ),
+        material(0xf0c4ad)
+    );
+
+memHead.position.y =
+    2.4;
+
+memHead.castShadow = true;
+
+mem.add(memHead);
+
+
+/* hair */
+
+const memHair =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .78,
+            32,
+            32
+        ),
+        material(0x4a304b)
+    );
+
+memHair.scale.set(
+    1,
+    1.05,
+    .8
+);
+
+memHair.position.set(
+    0,
+    2.65,
+    -.08
+);
+
+memHair.castShadow = true;
+
+mem.add(memHair);
+
+
+/* eyes */
+
+function eye(x){
+
+    const e =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .09,
+                16,
+                16
+            ),
+            material(0x201823)
+        );
+
+    e.position.set(
+        x,
+        2.45,
+        -.67
+    );
+
+    mem.add(e);
+
+}
+
+eye(-.23);
+eye(.23);
+
+
+/* heart */
+
+const heart =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .15,
+            16,
+            16
+        ),
+        material(0xd4778c)
+    );
+
+heart.position.set(
+    0,
+    1.2,
+    -.65
+);
+
+mem.add(heart);
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+const keys = {};
+
+document.addEventListener(
+    "keydown",
+    e=>{
+        keys[e.key.toLowerCase()] = true;
+    }
+);
+
+document.addEventListener(
+    "keyup",
+    e=>{
+        keys[e.key.toLowerCase()] = false;
+    }
+);
+
+
+/* mouse look */
+
+let yaw = 0;
+let pitch = 0;
+
+let locked = false;
+
+renderer.domElement.addEventListener(
+    "click",
+    ()=>{
+        if(
+            document.pointerLockElement !==
+            renderer.domElement
+        ){
+
+            renderer.domElement.requestPointerLock();
+
+        }
+    }
+);
+
+document.addEventListener(
+    "pointerlockchange",
+    ()=>{
+        locked =
+            document.pointerLockElement ===
+            renderer.domElement;
+    }
+);
+
+document.addEventListener(
+    "mousemove",
+    e=>{
+
+        if(!locked)return;
+
+        yaw -= e.movementX * .002;
+        pitch -= e.movementY * .002;
+
+        pitch =
+            Math.max(
+                -1.3,
+                Math.min(1.3,pitch)
+            );
+
+    }
+);
+
+
+/* =====================================================
+   COLLISION
+===================================================== */
+
+function clampPlayer(){
+
+    camera.position.x =
+        Math.max(
+            -10.5,
+            Math.min(
+                10.5,
+                camera.position.x
+            )
+        );
+
+    camera.position.z =
+        Math.max(
+            -10.5,
+            Math.min(
+                10.5,
+                camera.position.z
+            )
+        );
+
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+let messageTimer;
+
+function say(text){
+
+    const m =
+        document.getElementById("message");
+
+    m.innerHTML = text;
+
+    m.style.opacity = 1;
+
+    clearTimeout(messageTimer);
+
+    messageTimer =
+        setTimeout(
+            ()=>{
+                m.style.opacity = 0;
+            },
+            3500
+        );
+
+}
+
+
+/* =====================================================
+   HORROR EVENTS
+===================================================== */
+
+let started = false;
+let scareDone = false;
+
+function distanceToMem(){
+
+    return camera.position.distanceTo(
+        mem.position
+    );
+
+}
+
+function randomMemEvent(){
+
+    if(!started)return;
+
+    const r =
+        Math.random();
+
+    if(r < .25){
+
+        mem.position.x =
+            camera.position.x + 3;
+
+        mem.position.z =
+            camera.position.z - 7;
+
+        say(
+            "هل رأيت شيئًا يتحرك؟"
+        );
+
+    }
+
+    else if(r < .45){
+
+        say(
+            "سمعت صوتًا في الغرفة الأخرى..."
+        );
+
+    }
+
+    else if(r < .55 && !scareDone){
+
+        scareDone = true;
+
+        setTimeout(
+            jumpScare,
+            1500
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   JUMPSCARE
+===================================================== */
+
+function jumpScare(){
+
+    const s =
+        document.getElementById("scare");
+
+    s.classList.add("show");
+
+    setTimeout(
+        ()=>{
+            s.classList.remove("show");
+        },
+        1200
+    );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        ()=>{
+
+            document
+                .getElementById("start")
+                .style.display =
+                "none";
+
+            started = true;
+
+            say(
+                "اليوم الأول.<br>" +
+                "ابحث عن Mem."
+            );
+
+            renderer.domElement.requestPointerLock();
+
+        }
+    );
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+const clock =
+    new THREE.Clock();
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const delta =
+        clock.getDelta();
+
+    const speed =
+        4 * delta;
+
+    let forward = 0;
+    let right = 0;
+
+    if(keys["w"]) forward += 1;
+    if(keys["s"]) forward -= 1;
+    if(keys["d"]) right += 1;
+    if(keys["a"]) right -= 1;
+
+    const direction =
+        new THREE.Vector3(
+            Math.sin(yaw),
+            0,
+            Math.cos(yaw)
+        );
+
+    const side =
+        new THREE.Vector3(
+            Math.cos(yaw),
+            0,
+            -Math.sin(yaw)
+        );
+
+    camera.position.addScaledVector(
+        direction,
+        -forward * speed
+    );
+
+    camera.position.addScaledVector(
+        side,
+        right * speed
+    );
+
+    camera.position.y =
+        1.7;
+
+    clampPlayer();
+
+
+    /* camera rotation */
+
+    camera.rotation.order =
+        "YXZ";
+
+    camera.rotation.y =
+        yaw;
+
+    camera.rotation.x =
+        pitch;
+
+
+    /* MEM breathing */
+
+    if(started){
+
+        mem.position.y =
+            Math.sin(
+                performance.now() * .002
+            ) * .025;
+
+    }
+
+
+    /* random events */
+
+    if(
+        started &&
+        Math.random() < .0008
+    ){
+
+        randomMemEvent();
+
+    }
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+animate();
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
