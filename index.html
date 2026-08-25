@@ -1,506 +1,614 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MEM — 3D Horror</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MEM</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 html,body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#050507;
-    font-family:Arial,Tahoma,sans-serif;
+    background:#08090b;
+    font-family:Arial,sans-serif;
 }
 
-#game{
-    width:100%;
-    height:100%;
-    position:relative;
+canvas{
+    display:block;
 }
 
-#ui{
-    position:absolute;
-    top:20px;
-    left:20px;
-    z-index:10;
-    color:white;
-    background:rgba(0,0,0,.45);
-    padding:15px 18px;
-    border-radius:12px;
-    backdrop-filter:blur(8px);
-    pointer-events:none;
-}
-
-#title{
-    font-size:22px;
-    font-weight:bold;
-    letter-spacing:4px;
-}
-
-#hint{
-    margin-top:8px;
-    font-size:13px;
-    opacity:.8;
-}
-
-#message{
-    position:absolute;
-    bottom:35px;
-    left:50%;
-    transform:translateX(-50%);
-    color:white;
-    background:rgba(0,0,0,.65);
-    padding:14px 24px;
-    border-radius:12px;
-    z-index:20;
-    opacity:0;
-    transition:.4s;
-    text-align:center;
-    pointer-events:none;
-}
-
-#start{
-    position:absolute;
+#intro{
+    position:fixed;
     inset:0;
     z-index:100;
     display:flex;
     align-items:center;
     justify-content:center;
+
     background:
-        radial-gradient(circle,#29252d 0%,#050507 70%);
+        radial-gradient(
+            circle at center,
+            rgba(55,48,55,.35),
+            rgba(5,6,8,.98)
+        );
+
     color:white;
+}
+
+.intro-box{
     text-align:center;
+    max-width:600px;
+    padding:40px;
 }
 
-#startBox{
-    max-width:500px;
-    padding:30px;
+.logo{
+    font-size:70px;
+    letter-spacing:18px;
+    margin-bottom:10px;
 }
 
-#startBox h1{
-    font-size:55px;
-    letter-spacing:12px;
-    margin:0 0 10px;
-}
-
-#startBox p{
+.subtitle{
+    opacity:.65;
     line-height:1.8;
-    opacity:.8;
+    margin-bottom:35px;
 }
 
-#startButton{
-    border:0;
-    padding:15px 35px;
-    border-radius:12px;
-    background:#e5d2d9;
-    color:#211a20;
-    font-size:17px;
+#start{
+    border:none;
+    padding:15px 45px;
+    border-radius:30px;
     cursor:pointer;
+
+    background:#eee7e5;
+    color:#171518;
+
+    font-size:17px;
+    transition:.25s;
 }
 
-#scare{
-    position:absolute;
-    inset:0;
-    z-index:200;
-    background:#000;
-    display:none;
-    align-items:center;
-    justify-content:center;
+#start:hover{
+    transform:scale(1.05);
 }
 
-#scare.show{
-    display:flex;
-    animation:flash .12s infinite;
-}
+#hud{
+    position:fixed;
+    top:20px;
+    left:20px;
 
-#scareFace{
-    width:260px;
-    height:340px;
-    position:relative;
-    transform:scale(1.4);
-}
+    z-index:20;
 
-.faceHair{
-    position:absolute;
-    inset:0;
-    background:#09070b;
-    border-radius:50%;
-}
-
-.face{
-    position:absolute;
-    width:190px;
-    height:240px;
-    left:35px;
-    top:55px;
-    border-radius:50%;
-    background:#c9aaa1;
-}
-
-.eye{
-    position:absolute;
-    top:95px;
-    width:30px;
-    height:50px;
-    background:#030303;
-    border-radius:50%;
-}
-
-.eye.one{left:35px}
-.eye.two{right:35px}
-
-.mouth{
-    position:absolute;
-    left:60px;
-    top:170px;
-    width:70px;
-    height:50px;
-    background:#050505;
-    border-radius:0 0 40px 40px;
-}
-
-#scareText{
-    position:absolute;
-    bottom:45px;
     color:white;
-    font-size:25px;
+
+    background:rgba(0,0,0,.35);
+
+    padding:12px 16px;
+
+    border-radius:12px;
+
+    backdrop-filter:blur(8px);
+
+    pointer-events:none;
 }
 
-@keyframes flash{
-    0%{filter:brightness(4)}
-    50%{filter:brightness(.2)}
-    100%{filter:brightness(1)}
+#day{
+    font-size:15px;
+}
+
+#objective{
+    margin-top:5px;
+    opacity:.65;
+    font-size:12px;
+}
+
+#interaction{
+    position:fixed;
+    bottom:45px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:white;
+
+    background:rgba(0,0,0,.55);
+
+    padding:12px 22px;
+
+    border-radius:20px;
+
+    opacity:0;
+
+    transition:.3s;
+
+    pointer-events:none;
+}
+
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+
+    width:5px;
+    height:5px;
+
+    transform:translate(-50%,-50%);
+
+    background:white;
+
+    border-radius:50%;
+
+    opacity:.8;
+
+    z-index:30;
+
+    pointer-events:none;
+}
+
+#blackout{
+    position:fixed;
+    inset:0;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:80;
+
+    transition:opacity 1s;
+}
+
+#blackout.show{
+    opacity:1;
 }
 </style>
 </head>
 
+
 <body>
 
-<div id="game">
+<div id="intro">
 
-    <div id="ui">
-        <div id="title">MEM</div>
-        <div id="day">اليوم 1</div>
-        <div id="hint">
-            WASD للحركة — الماوس للنظر
-        </div>
-    </div>
+    <div class="intro-box">
 
-    <div id="message"></div>
-
-    <div id="start">
-        <div id="startBox">
-            <h1>MEM</h1>
-            <p>
-                في البداية، كل شيء طبيعي.<br>
-                لكن لا تثق بكل شيء تراه.
-            </p>
-
-            <button id="startButton">
-                ابدأ اللعبة
-            </button>
-        </div>
-    </div>
-
-    <div id="scare">
-        <div id="scareFace">
-
-            <div class="faceHair"></div>
-
-            <div class="face">
-                <div class="eye one"></div>
-                <div class="eye two"></div>
-                <div class="mouth"></div>
-            </div>
-
-        </div>
-
-        <div id="scareText">
+        <div class="logo">
             MEM
         </div>
+
+        <div class="subtitle">
+
+            في البداية كان كل شيء طبيعيًا.<br>
+            مجرد بيت... ومجرد فتاة اسمها Mem.
+
+        </div>
+
+        <button id="start">
+            ابدأ
+        </button>
+
     </div>
 
 </div>
 
 
+<div id="hud">
+
+    <div id="day">
+        اليوم الأول
+    </div>
+
+    <div id="objective">
+        استكشف البيت
+    </div>
+
+</div>
+
+
+<div id="crosshair"></div>
+
+<div id="interaction">
+    اضغط E للتفاعل
+</div>
+
+<div id="blackout"></div>
+
+
 <script type="module">
 
-import * as THREE
-from
-'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+import { GLTFLoader } from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
 
 /* =====================================================
-   BASIC SETUP
+   SCENE
 ===================================================== */
 
 const scene =
-    new THREE.Scene();
+new THREE.Scene();
 
 scene.background =
-    new THREE.Color(0x17151b);
+new THREE.Color(0x101216);
 
 scene.fog =
-    new THREE.Fog(
-        0x17151b,
-        10,
-        42
-    );
+new THREE.Fog(
+    0x101216,
+    8,
+    45
+);
 
+
+/* =====================================================
+   CAMERA
+===================================================== */
 
 const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        100
-    );
+new THREE.PerspectiveCamera(
+    70,
+    innerWidth / innerHeight,
+    .05,
+    100
+);
 
 camera.position.set(
     0,
-    1.7,
+    1.65,
     8
 );
 
 
+/* =====================================================
+   RENDERER
+===================================================== */
+
 const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true
-    });
+new THREE.WebGLRenderer({
+    antialias:true
+});
 
 renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
+    innerWidth,
+    innerHeight
 );
 
 renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio,2)
+    Math.min(
+        devicePixelRatio,
+        2
+    )
 );
 
 renderer.shadowMap.enabled = true;
 
-document
-    .getElementById("game")
-    .appendChild(renderer.domElement);
+renderer.shadowMap.type =
+THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+1.15;
+
+document.body.appendChild(
+    renderer.domElement
+);
 
 
 /* =====================================================
-   LIGHTS
+   LIGHTING
 ===================================================== */
 
-const ambient =
-    new THREE.HemisphereLight(
-        0xffead7,
-        0x443d4a,
-        2
-    );
-
-scene.add(ambient);
-
-
-const lampLight =
-    new THREE.PointLight(
-        0xffd29a,
-        8,
-        15
-    );
-
-lampLight.position.set(
-    0,
-    3.5,
-    1
+const sky =
+new THREE.HemisphereLight(
+    0xbcc9dc,
+    0x241d20,
+    1.8
 );
 
-lampLight.castShadow = true;
+scene.add(sky);
 
-scene.add(lampLight);
+
+const mainLight =
+new THREE.DirectionalLight(
+    0xffe6ce,
+    2.5
+);
+
+mainLight.position.set(
+    -5,
+    8,
+    4
+);
+
+mainLight.castShadow = true;
+
+mainLight.shadow.mapSize.width = 2048;
+mainLight.shadow.mapSize.height = 2048;
+
+scene.add(mainLight);
 
 
 /* =====================================================
    MATERIALS
 ===================================================== */
 
-function material(color){
+function mat(
+    color,
+    roughness=.8
+){
 
     return new THREE.MeshStandardMaterial({
-        color:color,
-        roughness:.8
+        color,
+        roughness
     });
 
 }
 
 
 /* =====================================================
-   ROOM
+   CREATE BOX
 ===================================================== */
 
 function box(
-    x,y,z,
-    sx,sy,sz,
+    x,
+    y,
+    z,
+    width,
+    height,
+    depth,
     color
 ){
 
-    const mesh =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                sx,sy,sz
-            ),
-            material(color)
-        );
+    const object =
+    new THREE.Mesh(
 
-    mesh.position.set(
-        x,y,z
+        new THREE.BoxGeometry(
+            width,
+            height,
+            depth
+        ),
+
+        mat(color)
+
     );
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    object.position.set(
+        x,
+        y,
+        z
+    );
 
-    scene.add(mesh);
+    object.castShadow = true;
+    object.receiveShadow = true;
 
-    return mesh;
+    scene.add(object);
+
+    return object;
 }
 
 
-/* FLOOR */
+/* =====================================================
+   FLOOR
+===================================================== */
 
 box(
     0,
+    -.1,
     0,
-    0,
-    24,
+
+    28,
     .2,
-    24,
-    0x795b4d
-);
+    28,
 
-
-/* WALLS */
-
-box(
-    0,
-    4,
-    -12,
-    24,
-    8,
-    .3,
-    0xcdbdb1
-);
-
-box(
-    -12,
-    4,
-    0,
-    .3,
-    8,
-    24,
-    0xcdbdb1
-);
-
-box(
-    12,
-    4,
-    0,
-    .3,
-    8,
-    24,
-    0xcdbdb1
-);
-
-
-/* BACK WALL DETAIL */
-
-box(
-    0,
-    4,
-    11.8,
-    24,
-    8,
-    .3,
-    0xb9a9a0
+    0x6e5b52
 );
 
 
 /* =====================================================
-   BED
+   HOUSE OUTER WALLS
 ===================================================== */
 
 box(
-    6,
-    1,
-    -7,
+    0,
+    4,
+    -13,
+
+    28,
+    8,
+    .3,
+
+    0xbeb6b1
+);
+
+box(
+    -14,
+    4,
+    0,
+
+    .3,
+    8,
+    26,
+
+    0xbeb6b1
+);
+
+box(
+    14,
+    4,
+    0,
+
+    .3,
+    8,
+    26,
+
+    0xbeb6b1
+);
+
+
+/* =====================================================
+   INTERIOR WALLS
+===================================================== */
+
+/*
+   هذه بداية تقسيم البيت:
+
+   ┌───────────────┐
+   │    غرفة       │
+   │               │
+   ├───────┬───────┤
+   │ صالة  │ مطبخ  │
+   │       │       │
+   └───────┴───────┘
+*/
+
+
+box(
+    -5,
+    4,
+    -3,
+
+    .25,
+    8,
+    8,
+
+    0xc7beb8
+);
+
+
+box(
     5,
-    1.3,
-    3,
-    0x62483f
+    4,
+    -3,
+
+    .25,
+    8,
+    8,
+
+    0xc7beb8
 );
 
-box(
-    6,
-    1.7,
-    -7,
-    4.7,
-    .5,
-    2.7,
-    0xe9ded5
-);
 
 box(
-    6,
-    2.1,
-    -7.6,
+    0,
+    4,
     2,
-    .35,
-    1.7,
-    0xf7f0e9
-);
 
-box(
-    6,
-    1.9,
-    -6.4,
-    4.5,
-    .35,
-    1.5,
-    0x788f98
+    10,
+    8,
+    .25,
+
+    0xc7beb8
 );
 
 
 /* =====================================================
-   DESK
+   CARPET
+===================================================== */
+
+const carpet =
+new THREE.Mesh(
+
+    new THREE.BoxGeometry(
+        8,
+        .08,
+        5
+    ),
+
+    mat(0x80666b)
+
+);
+
+carpet.position.set(
+    0,
+    .05,
+    6
+);
+
+carpet.receiveShadow = true;
+
+scene.add(carpet);
+
+
+/* =====================================================
+   SOFA
 ===================================================== */
 
 box(
     -6,
-    1.5,
-    -6,
-    4,
-    .35,
-    1.5,
-    0x65493f
+    1.3,
+    7,
+
+    5,
+    1.4,
+    2,
+
+    0x4c5157
 );
 
 box(
-    -7.6,
-    .7,
     -6,
+    2.5,
+    6.2,
+
+    5,
+    2,
+    .5,
+
+    0x4c5157
+);
+
+
+/* =====================================================
+   COFFEE TABLE
+===================================================== */
+
+box(
+    0,
+    .8,
+    7,
+
+    3,
     .25,
-    1.4,
-    .25,
-    0x543d36
+    1.7,
+
+    0x563e34
 );
 
 box(
-    -4.4,
-    .7,
-    -6,
-    .25,
-    1.4,
-    .25,
-    0x543d36
+    -1.1,
+    .4,
+    7,
+
+    .18,
+    .8,
+    .18,
+
+    0x3d2b25
+);
+
+box(
+    1.1,
+    .4,
+    7,
+
+    .18,
+    .8,
+    .18,
+
+    0x3d2b25
 );
 
 
@@ -508,265 +616,245 @@ box(
    WINDOW
 ===================================================== */
 
-const windowGlass =
-    new THREE.Mesh(
-        new THREE.BoxGeometry(
-            5,
-            3.5,
-            .15
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x79a4ba,
-            roughness:.2,
-            metalness:.1
-        })
-    );
+const glass =
+new THREE.Mesh(
 
-windowGlass.position.set(
-    0,
-    4,
-    -11.75
+    new THREE.BoxGeometry(
+        5,
+        3.5,
+        .1
+    ),
+
+    new THREE.MeshPhysicalMaterial({
+
+        color:0x6e8992,
+
+        roughness:.15,
+
+        transparent:true,
+
+        opacity:.65
+
+    })
+
 );
 
-scene.add(windowGlass);
+glass.position.set(
+    0,
+    4.2,
+    -12.75
+);
+
+scene.add(glass);
 
 
-/* WINDOW FRAME */
+/* =====================================================
+   WINDOW FRAME
+===================================================== */
 
 box(
     -2.5,
-    4,
-    -11.55,
-    .25,
-    4,
-    .25,
-    0xf0e7df
+    4.2,
+    -12.55,
+
+    .18,
+    3.8,
+    .2,
+
+    0xe5dfda
 );
 
 box(
     2.5,
-    4,
-    -11.55,
-    .25,
-    4,
-    .25,
-    0xf0e7df
+    4.2,
+    -12.55,
+
+    .18,
+    3.8,
+    .2,
+
+    0xe5dfda
 );
 
 box(
     0,
-    5.9,
-    -11.55,
+    6,
+    -12.55,
+
     5,
-    .25,
-    .25,
-    0xf0e7df
+    .18,
+    .2,
+
+    0xe5dfda
 );
 
 box(
     0,
-    2.1,
-    -11.55,
+    2.4,
+    -12.55,
+
     5,
-    .25,
-    .25,
-    0xf0e7df
+    .18,
+    .2,
+
+    0xe5dfda
 );
-
-
-/* =====================================================
-   RUG
-===================================================== */
-
-const rug =
-    new THREE.Mesh(
-        new THREE.CylinderGeometry(
-            3.5,
-            3.5,
-            .08,
-            48
-        ),
-        material(0xa98589)
-    );
-
-rug.rotation.x =
-    Math.PI / 2;
-
-rug.position.set(
-    0,
-    .12,
-    1
-);
-
-scene.add(rug);
 
 
 /* =====================================================
    MEM
 ===================================================== */
 
-const mem =
-    new THREE.Group();
+/*
 
-mem.position.set(
-    0,
-    0,
-    -3
-);
+   هنا مكان موديل Mem الحقيقي.
 
-scene.add(mem);
+   لما نجهز ملف:
 
+   mem.glb
 
-/* body */
+   نحطه بجانب index.html
+   ثم نفعّل الكود الموجود تحت.
 
-const memBody =
-    new THREE.Mesh(
-        new THREE.CapsuleGeometry(
-            .65,
-            1.2,
-            8,
-            16
-        ),
-        material(0x8eaca6)
-    );
-
-memBody.position.y =
-    1.1;
-
-memBody.castShadow = true;
-
-mem.add(memBody);
+*/
 
 
-/* head */
-
-const memHead =
-    new THREE.Mesh(
-        new THREE.SphereGeometry(
-            .7,
-            32,
-            32
-        ),
-        material(0xf0c4ad)
-    );
-
-memHead.position.y =
-    2.4;
-
-memHead.castShadow = true;
-
-mem.add(memHead);
-
-
-/* hair */
-
-const memHair =
-    new THREE.Mesh(
-        new THREE.SphereGeometry(
-            .78,
-            32,
-            32
-        ),
-        material(0x4a304b)
-    );
-
-memHair.scale.set(
-    1,
-    1.05,
-    .8
-);
-
-memHair.position.set(
-    0,
-    2.65,
-    -.08
-);
-
-memHair.castShadow = true;
-
-mem.add(memHair);
-
-
-/* eyes */
-
-function eye(x){
-
-    const e =
-        new THREE.Mesh(
-            new THREE.SphereGeometry(
-                .09,
-                16,
-                16
-            ),
-            material(0x201823)
-        );
-
-    e.position.set(
-        x,
-        2.45,
-        -.67
-    );
-
-    mem.add(e);
-
-}
-
-eye(-.23);
-eye(.23);
-
-
-/* heart */
-
-const heart =
-    new THREE.Mesh(
-        new THREE.SphereGeometry(
-            .15,
-            16,
-            16
-        ),
-        material(0xd4778c)
-    );
-
-heart.position.set(
-    0,
-    1.2,
-    -.65
-);
-
-mem.add(heart);
+let mem = null;
 
 
 /* =====================================================
-   CONTROLS
+   LOAD REAL MEM MODEL
+===================================================== */
+
+const loader =
+new GLTFLoader();
+
+
+function loadMem(){
+
+    loader.load(
+
+        "mem.glb",
+
+        function(gltf){
+
+            mem =
+            gltf.scene;
+
+            mem.scale.set(
+                1,
+                1,
+                1
+            );
+
+            mem.position.set(
+                0,
+                0,
+                -7
+            );
+
+            mem.traverse(
+                object => {
+
+                    if(
+                        object.isMesh
+                    ){
+
+                        object.castShadow =
+                        true;
+
+                        object.receiveShadow =
+                        true;
+
+                    }
+
+                }
+            );
+
+            scene.add(mem);
+
+        },
+
+        undefined,
+
+        function(){
+
+            console.log(
+                "Mem model not found yet."
+            );
+
+        }
+
+    );
+
+}
+
+
+/*
+   حالياً لا نشغلها لأن
+   ملف mem.glb لم نصنعه بعد.
+
+   loadMem();
+*/
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+const player = {
+
+    speed:4,
+
+    height:1.65,
+
+    yaw:0,
+
+    pitch:0
+
+};
+
+
+/* =====================================================
+   KEYBOARD
 ===================================================== */
 
 const keys = {};
 
 document.addEventListener(
     "keydown",
-    e=>{
-        keys[e.key.toLowerCase()] = true;
+    event => {
+
+        keys[
+            event.key.toLowerCase()
+        ] = true;
+
     }
 );
 
 document.addEventListener(
     "keyup",
-    e=>{
-        keys[e.key.toLowerCase()] = false;
+    event => {
+
+        keys[
+            event.key.toLowerCase()
+        ] = false;
+
     }
 );
 
 
-/* mouse look */
+/* =====================================================
+   MOUSE
+===================================================== */
 
-let yaw = 0;
-let pitch = 0;
+let mouseLocked = false;
 
-let locked = false;
 
 renderer.domElement.addEventListener(
     "click",
-    ()=>{
+    () => {
+
         if(
             document.pointerLockElement !==
             renderer.domElement
@@ -775,31 +863,45 @@ renderer.domElement.addEventListener(
             renderer.domElement.requestPointerLock();
 
         }
+
     }
 );
+
 
 document.addEventListener(
     "pointerlockchange",
-    ()=>{
-        locked =
-            document.pointerLockElement ===
-            renderer.domElement;
+    () => {
+
+        mouseLocked =
+        document.pointerLockElement ===
+        renderer.domElement;
+
     }
 );
 
+
 document.addEventListener(
     "mousemove",
-    e=>{
+    event => {
 
-        if(!locked)return;
+        if(!mouseLocked)
+            return;
 
-        yaw -= e.movementX * .002;
-        pitch -= e.movementY * .002;
+        player.yaw -=
+            event.movementX *
+            .002;
 
-        pitch =
+        player.pitch -=
+            event.movementY *
+            .002;
+
+        player.pitch =
             Math.max(
-                -1.3,
-                Math.min(1.3,pitch)
+                -1.35,
+                Math.min(
+                    1.35,
+                    player.pitch
+                )
             );
 
     }
@@ -807,135 +909,92 @@ document.addEventListener(
 
 
 /* =====================================================
-   COLLISION
+   PLAYER MOVEMENT
 ===================================================== */
 
-function clampPlayer(){
+function updatePlayer(
+    delta
+){
+
+    let forward = 0;
+    let sideways = 0;
+
+    if(keys["w"])
+        forward += 1;
+
+    if(keys["s"])
+        forward -= 1;
+
+    if(keys["a"])
+        sideways -= 1;
+
+    if(keys["d"])
+        sideways += 1;
+
+
+    const direction =
+    new THREE.Vector3(
+        Math.sin(player.yaw),
+        0,
+        Math.cos(player.yaw)
+    );
+
+
+    const side =
+    new THREE.Vector3(
+        Math.cos(player.yaw),
+        0,
+        -Math.sin(player.yaw)
+    );
+
+
+    camera.position.addScaledVector(
+        direction,
+        -forward *
+        player.speed *
+        delta
+    );
+
+
+    camera.position.addScaledVector(
+        side,
+        sideways *
+        player.speed *
+        delta
+    );
+
+
+    /*
+       حدود البيت
+    */
 
     camera.position.x =
-        Math.max(
-            -10.5,
-            Math.min(
-                10.5,
-                camera.position.x
-            )
+        THREE.MathUtils.clamp(
+            camera.position.x,
+            -12.5,
+            12.5
         );
 
     camera.position.z =
-        Math.max(
-            -10.5,
-            Math.min(
-                10.5,
-                camera.position.z
-            )
+        THREE.MathUtils.clamp(
+            camera.position.z,
+            -11.5,
+            11.5
         );
 
-}
+
+    camera.position.y =
+        player.height;
 
 
-/* =====================================================
-   MESSAGE
-===================================================== */
+    camera.rotation.order =
+        "YXZ";
 
-let messageTimer;
+    camera.rotation.y =
+        player.yaw;
 
-function say(text){
-
-    const m =
-        document.getElementById("message");
-
-    m.innerHTML = text;
-
-    m.style.opacity = 1;
-
-    clearTimeout(messageTimer);
-
-    messageTimer =
-        setTimeout(
-            ()=>{
-                m.style.opacity = 0;
-            },
-            3500
-        );
-
-}
-
-
-/* =====================================================
-   HORROR EVENTS
-===================================================== */
-
-let started = false;
-let scareDone = false;
-
-function distanceToMem(){
-
-    return camera.position.distanceTo(
-        mem.position
-    );
-
-}
-
-function randomMemEvent(){
-
-    if(!started)return;
-
-    const r =
-        Math.random();
-
-    if(r < .25){
-
-        mem.position.x =
-            camera.position.x + 3;
-
-        mem.position.z =
-            camera.position.z - 7;
-
-        say(
-            "هل رأيت شيئًا يتحرك؟"
-        );
-
-    }
-
-    else if(r < .45){
-
-        say(
-            "سمعت صوتًا في الغرفة الأخرى..."
-        );
-
-    }
-
-    else if(r < .55 && !scareDone){
-
-        scareDone = true;
-
-        setTimeout(
-            jumpScare,
-            1500
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   JUMPSCARE
-===================================================== */
-
-function jumpScare(){
-
-    const s =
-        document.getElementById("scare");
-
-    s.classList.add("show");
-
-    setTimeout(
-        ()=>{
-            s.classList.remove("show");
-        },
-        1200
-    );
+    camera.rotation.x =
+        player.pitch;
 
 }
 
@@ -945,27 +1004,45 @@ function jumpScare(){
 ===================================================== */
 
 document
-    .getElementById("startButton")
-    .addEventListener(
-        "click",
-        ()=>{
+.getElementById("start")
+.addEventListener(
+    "click",
+    () => {
 
-            document
-                .getElementById("start")
-                .style.display =
-                "none";
+        document
+        .getElementById("intro")
+        .style.display =
+        "none";
 
-            started = true;
+        renderer
+        .domElement
+        .requestPointerLock();
 
-            say(
-                "اليوم الأول.<br>" +
-                "ابحث عن Mem."
-            );
+    }
+);
 
-            renderer.domElement.requestPointerLock();
 
-        }
-    );
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        camera.aspect =
+            innerWidth /
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
+);
 
 
 /* =====================================================
@@ -973,7 +1050,8 @@ document
 ===================================================== */
 
 const clock =
-    new THREE.Clock();
+new THREE.Clock();
+
 
 function animate(){
 
@@ -984,79 +1062,35 @@ function animate(){
     const delta =
         clock.getDelta();
 
-    const speed =
-        4 * delta;
 
-    let forward = 0;
-    let right = 0;
-
-    if(keys["w"]) forward += 1;
-    if(keys["s"]) forward -= 1;
-    if(keys["d"]) right += 1;
-    if(keys["a"]) right -= 1;
-
-    const direction =
-        new THREE.Vector3(
-            Math.sin(yaw),
-            0,
-            Math.cos(yaw)
-        );
-
-    const side =
-        new THREE.Vector3(
-            Math.cos(yaw),
-            0,
-            -Math.sin(yaw)
-        );
-
-    camera.position.addScaledVector(
-        direction,
-        -forward * speed
+    updatePlayer(
+        delta
     );
 
-    camera.position.addScaledVector(
-        side,
-        right * speed
-    );
 
-    camera.position.y =
-        1.7;
+    /*
+       حركة خفيفة للكاميرا
+       أثناء المشي
+    */
 
-    clampPlayer();
+    const moving =
+        keys["w"] ||
+        keys["s"] ||
+        keys["a"] ||
+        keys["d"];
 
-
-    /* camera rotation */
-
-    camera.rotation.order =
-        "YXZ";
-
-    camera.rotation.y =
-        yaw;
-
-    camera.rotation.x =
-        pitch;
-
-
-    /* MEM breathing */
-
-    if(started){
-
-        mem.position.y =
-            Math.sin(
-                performance.now() * .002
-            ) * .025;
-
-    }
-
-
-    /* random events */
 
     if(
-        started &&
-        Math.random() < .0008
+        moving &&
+        mouseLocked
     ){
 
-        randomMemEvent();
+        camera.position.y =
+            player.height +
+            Math.sin(
+                performance.now() *
+                .009
+            ) * .025;
 
     }
 
@@ -1068,33 +1102,10 @@ function animate(){
 
 }
 
+
 animate();
-
-
-/* =====================================================
-   RESIZE
-===================================================== */
-
-window.addEventListener(
-    "resize",
-    ()=>{
-
-        camera.aspect =
-            window.innerWidth /
-            window.innerHeight;
-
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
-
-    }
-);
 
 </script>
 
 </body>
 </html>
-```
