@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
   }
   *{box-sizing:border-box}
   body{
-    margin:0; min-height:100vh; color:var(--ink);
+    margin:0; min-height:100vh; color:var(--ink); direction:ltr;
     font-family: "Segoe UI", Tahoma, Arial, sans-serif;
     background:
       radial-gradient(circle at 15% 10%, rgba(255,255,255,.9), transparent 28%),
@@ -93,6 +93,12 @@
   .story-text{padding:clamp(20px,4vw,34px);line-height:2.05;font-size:1.04rem}
   .story-text p{margin:0 0 16px}
   .story-text p:last-child{margin-bottom:0}
+  .bilingual{display:flex;flex-direction:column;gap:5px}
+  .bilingual .en{direction:ltr;text-align:left;display:block;font-family:Georgia,"Times New Roman",serif}
+  .bilingual .ar{direction:rtl;text-align:right;display:block;color:#766b7d}
+  .ui-bilingual{display:flex;flex-direction:column;gap:3px}
+  .ui-bilingual .en{direction:ltr;display:block}
+  .ui-bilingual .ar{direction:rtl;display:block;font-size:.92em;opacity:.9}
   .dropcap:first-letter{font-size:2.5rem;color:var(--plum);font-weight:800;float:right;line-height:1;margin-left:5px}
   .illustration{min-height:320px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:flex-end;
     background:linear-gradient(180deg,#29243a 0%,#5a426e 48%,#d9a4bb 100%);color:white;padding:22px}
@@ -129,13 +135,13 @@
 <body>
 <header class="topbar">
   <div class="brand">✉ <span>Story Mail</span></div>
-  <div class="tag">كل رسالة تخبّئ حكاية</div>
+  <div class="tag ui-bilingual"><span class="en">Every letter hides a story</span><span class="ar">كل رسالة تخبّئ حكاية</span></div>
 </header>
 <main>
   <section class="intro">
     <div class="eyebrow">A STORY WAITING FOR YOU</div>
-    <h1>رسالة من عالم آخر</h1>
-    <p>افتحي الظرف، اقرئي الفصل، واكتشفي الأسرار المخفية بين السطور.</p>
+    <h1 class="ui-bilingual"><span class="en">A Letter from Another World</span><span class="ar">رسالة من عالم آخر</span></h1>
+    <p class="ui-bilingual"><span class="en">Open the envelope, read the chapter, and uncover the secrets between the lines.</span><span class="ar">افتحي الظرف، اقرئي الفصل، واكتشفي الأسرار المخفية بين السطور.</span></p>
   </section>
 
   <section class="mail-stage" id="mailStage" aria-label="ظرف القصة">
@@ -143,77 +149,77 @@
     <div class="mail-wrap" id="mailWrap">
       <div class="letter">
         <span class="mini">PRIVATE STORY</span>
-        <strong>رسالة سرّية</strong>
-        <span>الفصل الأول ينتظركِ...</span>
+        <strong class="ui-bilingual"><span class="en">A Secret Letter</span><span class="ar">رسالة سرّية</span></strong>
+        <span class="ui-bilingual"><span class="en">Chapter One is waiting for you...</span><span class="ar">الفصل الأول ينتظركِ...</span></span>
       </div>
       <div class="envelope"></div>
       <div class="flap"></div>
       <div class="seal">✦</div>
     </div>
-    <div class="hint" id="hint">هناك حكاية تنتظر أن تُفتَح</div>
-    <button class="primary open-btn" id="openBtn">افتحي الرسالة ✉</button>
+    <div class="hint ui-bilingual" id="hint"><span class="en">A story is waiting to be opened</span><span class="ar">هناك حكاية تنتظر أن تُفتَح</span></div>
+    <button class="primary open-btn ui-bilingual" id="openBtn"><span class="en">Open the letter ✉</span><span class="ar">افتحي الرسالة ✉</span></button>
   </section>
 
   <section class="story" id="story">
     <div class="chapter-head">
       <div>
         <div class="chapter-no">CHAPTER 01</div>
-        <h2>النجمة التي أخفت سرّها</h2>
+        <h2 class="ui-bilingual"><span class="en">The Star Who Hid Her Secret</span><span class="ar">النجمة التي أخفت سرّها</span></h2>
       </div>
-      <button class="secondary" id="backBtn">↩ العودة إلى الظرف</button>
+      <button class="secondary ui-bilingual" id="backBtn"><span class="en">↩ Back to the letter</span><span class="ar">↩ العودة إلى الظرف</span></button>
     </div>
     <div class="story-grid">
       <article class="story-text">
-        <p class="dropcap">في مدينة لا تنام، كانت «آريا» أكثر نجمة يلمع اسمها على الشاشات. ابتسامتها تملأ الملصقات، وصوتها يجعل آلاف القلوب تخفق، لكن خلف الأضواء كانت تخفي سرًّا لم يعرفه أحد.</p>
-        <p>لم تكن آريا تعيش وحدها كما يظنّ جمهورها؛ فقد كانت متزوجة سرًّا، وكانت تحمي عائلتها من عيون الصحافة التي لا ترحم.</p>
-        <p>وفي ليلة ممطرة، وُلد توأمها: «رين» و«ميرا». لم يكونا طفلين عاديين؛ ففي أعماق روحيهما ذكريات حياة أخرى، ووجوهًا وأحداثًا لم يستطع أحد تفسيرها.</p>
-        <p>في تلك الحياة السابقة، كان رين طبيبًا شابًّا، وكانت ميرا فتاة تقاوم مرضًا قاسيًا. افترق الاثنان عن العالم قبل أن يحقّقا أحلامهما، لكن القدر منحهما بداية جديدة تحت سقف واحد.</p>
-        <p>مرّت السنوات، وصارت ضحكات التوأم أجمل ما في حياة آريا. ومع ذلك، كان هناك شخص يراقبها من بعيد، يرفض أن يتقبّل أن للنجمة حياة لا يملكها. لم تكن آريا تعلم أن سرّها أصبح في خطر.</p>
-        <p>وفي مساءٍ بدا عاديًّا، انطفأت الأضواء التي اعتادت أن تحيط بها. رحلت آريا، وتركت خلفها طفلين وبيتًا امتلأ بالصمت. لم يفهم رين كيف يمكن للعالم أن يصفّق لنجمة، ثم يتركها وحيدة حين تحتاج إلى الحماية.</p>
-        <p>منذ ذلك اليوم، تغيّر شيء في داخله. لم يعد يريد أن يعرف الحقيقة فقط؛ بل أراد أن يعيد أمه، مهما كان الثمن. وحين ظهرت فتاة ذكية اسمها «ليان»، قادرة على رؤية الأكاذيب التي لا يلاحظها الآخرون، قرّر رين الاقتراب منها.</p>
-        <p>كان يقول لنفسه إنه يحتاج إلى عقلها لا أكثر. لكنه لم ينتبه إلى أن بعض الأشخاص، حين يدخلون حياتنا كجزء من خطة، قد يصبحون الجزء الوحيد الذي لا نعرف كيف نخسره.</p>
-        <p><strong>وفي آخر الليل، ظهرت على مرآة رين كلمات لم يكتبها أحد:</strong><br>«إذا أردتَ استعادة ما فقدته، فابحث عن الحقيقة التي دُفنت مع النجمة.»</p>
+        <p class="dropcap bilingual"><span class="en">In a city that never slept, Aria was the brightest star on every screen. Her smile filled posters, and her voice made thousands of hearts beat faster. Yet behind the lights, she kept a secret no one knew.</span><span class="ar">في مدينة لا تنام، كانت «آريا» أكثر نجمة يلمع اسمها على الشاشات. ابتسامتها تملأ الملصقات، وصوتها يجعل آلاف القلوب تخفق، لكن خلف الأضواء كانت تخفي سرًّا لم يعرفه أحد.</span></p>
+        <p class="bilingual"><span class="en">Aria did not live alone, as her fans believed. She was secretly married, and she protected her family from the merciless eyes of the press.</span><span class="ar">لم تكن آريا تعيش وحدها كما يظنّ جمهورها؛ فقد كانت متزوجة سرًّا، وكانت تحمي عائلتها من عيون الصحافة التي لا ترحم.</span></p>
+        <p class="bilingual"><span class="en">On a rainy night, her twins were born: Ren and Mira. They were not ordinary children. Deep inside, they carried memories of another life—faces and events no one could explain.</span><span class="ar">وفي ليلة ممطرة، وُلد توأمها: «رين» و«ميرا». لم يكونا طفلين عاديين؛ ففي أعماق روحيهما ذكريات حياة أخرى، ووجوهًا وأحداثًا لم يستطع أحد تفسيرها.</span></p>
+        <p class="bilingual"><span class="en">In that previous life, Ren had been a young doctor, while Mira had been a girl fighting a serious illness. They left the world before their dreams came true, but fate gave them a new beginning under the same roof.</span><span class="ar">في تلك الحياة السابقة، كان رين طبيبًا شابًّا، وكانت ميرا فتاة تقاوم مرضًا قاسيًا. افترق الاثنان عن العالم قبل أن يحقّقا أحلامهما، لكن القدر منحهما بداية جديدة تحت سقف واحد.</span></p>
+        <p class="bilingual"><span class="en">As the years passed, the twins’ laughter became the brightest part of Aria’s life. But someone was watching her from afar, refusing to accept that the star had a life beyond his control. Aria did not know that her secret was in danger.</span><span class="ar">مرّت السنوات، وصارت ضحكات التوأم أجمل ما في حياة آريا. ومع ذلك، كان هناك شخص يراقبها من بعيد، يرفض أن يتقبّل أن للنجمة حياة لا يملكها. لم تكن آريا تعلم أن سرّها أصبح في خطر.</span></p>
+        <p class="bilingual"><span class="en">One evening, the lights that had always surrounded her went out. Aria was gone, leaving two children and a home filled with silence. Ren could not understand how the world could cheer for a star, then leave her alone when she needed protection.</span><span class="ar">وفي مساءٍ بدا عاديًّا، انطفأت الأضواء التي اعتادت أن تحيط بها. رحلت آريا، وتركت خلفها طفلين وبيتًا امتلأ بالصمت. لم يفهم رين كيف يمكن للعالم أن يصفّق لنجمة، ثم يتركها وحيدة حين تحتاج إلى الحماية.</span></p>
+        <p class="bilingual"><span class="en">From that day on, something inside him changed. He no longer wanted only to uncover the truth; he wanted to bring his mother back, whatever the cost. Then he met Lian, a brilliant girl who could see the lies others missed, and Ren decided to get close to her.</span><span class="ar">منذ ذلك اليوم، تغيّر شيء في داخله. لم يعد يريد أن يعرف الحقيقة فقط؛ بل أراد أن يعيد أمه، مهما كان الثمن. وحين ظهرت فتاة ذكية اسمها «ليان»، قادرة على رؤية الأكاذيب التي لا يلاحظها الآخرون، قرّر رين الاقتراب منها.</span></p>
+        <p class="bilingual"><span class="en">He told himself that he needed her mind and nothing more. But he failed to notice that someone who enters your life as part of a plan can become the one person you do not know how to lose.</span><span class="ar">كان يقول لنفسه إنه يحتاج إلى عقلها لا أكثر. لكنه لم ينتبه إلى أن بعض الأشخاص، حين يدخلون حياتنا كجزء من خطة، قد يصبحون الجزء الوحيد الذي لا نعرف كيف نخسره.</span></p>
+        <p class="bilingual"><strong class="en">Late that night, words appeared on Ren’s mirror—words no one had written:</strong><span class="ar">وفي آخر الليل، ظهرت على مرآة رين كلمات لم يكتبها أحد:</span><span class="en">“If you want to bring back what you lost, search for the truth buried with the star.”</span><span class="ar">«إذا أردتَ استعادة ما فقدته، فابحث عن الحقيقة التي دُفنت مع النجمة.»</span></p>
       </article>
 
       <aside class="illustration" aria-label="رسم تخيلي للمشهد">
-        <span class="illustration-label">رسم تخيّلي للمشهد</span>
+        <span class="illustration-label ui-bilingual"><span class="en">Imagined scene</span><span class="ar">رسم تخيّلي للمشهد</span></span>
         <div class="moon"></div>
         <div class="silhouette"></div>
         <div class="city"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="caption">
-          <strong>السرّ يبدأ خلف الأضواء...</strong>
-          <small>نجمة مشهورة، توأم يحملان ماضيًا غامضًا، وفتى لن يتراجع حتى يعرف الحقيقة.</small>
+          <strong class="ui-bilingual"><span class="en">The secret begins behind the lights...</span><span class="ar">السرّ يبدأ خلف الأضواء...</span></strong>
+          <small class="ui-bilingual"><span class="en">A famous star, twins with a mysterious past, and a boy who will not stop until he finds the truth.</span><span class="ar">نجمة مشهورة، توأم يحملان ماضيًا غامضًا، وفتى لن يتراجع حتى يعرف الحقيقة.</span></small>
         </div>
       </aside>
     </div>
 
     <section class="questions">
-      <h3>🧠 اختبري انتباهكِ</h3>
+      <h3 class="ui-bilingual"><span class="en">🧠 Test Your Attention</span><span class="ar">🧠 اختبري انتباهكِ</span></h3>
       <div class="question">
-        <strong>1. ما السر الذي كانت آريا تخفيه عن الجمهور؟</strong>
+        <strong class="ui-bilingual"><span class="en">1. What secret was Aria hiding from the public?</span><span class="ar">1. ما السر الذي كانت آريا تخفيه عن الجمهور؟</span></strong>
         <div class="answers">
-          <button class="answer" data-correct="false">أنها ستترك الغناء</button>
-          <button class="answer" data-correct="true">أنها متزوجة ولديها عائلة</button>
-          <button class="answer" data-correct="false">أنها لا تحب الموسيقى</button>
+          <button class="answer ui-bilingual" data-correct="false"><span class="en">She was going to quit singing</span><span class="ar">أنها ستترك الغناء</span></button>
+          <button class="answer ui-bilingual" data-correct="true"><span class="en">She was married and had a family</span><span class="ar">أنها متزوجة ولديها عائلة</span></button>
+          <button class="answer ui-bilingual" data-correct="false"><span class="en">She did not like music</span><span class="ar">أنها لا تحب الموسيقى</span></button>
         </div>
       </div>
       <div class="question">
-        <strong>2. لماذا اقترب رين من ليان؟</strong>
+        <strong class="ui-bilingual"><span class="en">2. Why did Ren get close to Lian?</span><span class="ar">2. لماذا اقترب رين من ليان؟</span></strong>
         <div class="answers">
-          <button class="answer" data-correct="true">لأنها ذكية ويمكنها مساعدته في كشف الحقيقة</button>
-          <button class="answer" data-correct="false">لأنها مديرة أعماله</button>
-          <button class="answer" data-correct="false">لأنها أخته</button>
+          <button class="answer ui-bilingual" data-correct="true"><span class="en">She was smart and could help him uncover the truth</span><span class="ar">لأنها ذكية ويمكنها مساعدته في كشف الحقيقة</span></button>
+          <button class="answer ui-bilingual" data-correct="false"><span class="en">She was his manager</span><span class="ar">لأنها مديرة أعماله</span></button>
+          <button class="answer ui-bilingual" data-correct="false"><span class="en">She was his sister</span><span class="ar">لأنها أخته</span></button>
         </div>
       </div>
       <div class="feedback" id="feedback" aria-live="polite"></div>
       <div class="end-actions">
-        <button class="primary" id="readAgain">قراءة الفصل مرة أخرى</button>
-        <button class="secondary" id="nextChapter">الفصل التالي قريبًا ♡</button>
+        <button class="primary ui-bilingual" id="readAgain"><span class="en">Read the chapter again</span><span class="ar">قراءة الفصل مرة أخرى</span></button>
+        <button class="secondary ui-bilingual" id="nextChapter"><span class="en">Next chapter coming soon ♡</span><span class="ar">الفصل التالي قريبًا ♡</span></button>
       </div>
     </section>
   </section>
 </main>
-<footer>صُنِع بحبّ للقصص والخيال ✦ يمكنكِ تغيير الأسماء والأحداث والنصوص من داخل الكود.</footer>
+<footer class="ui-bilingual"><span class="en">Made with love for stories and imagination ✦ You can change the names, events, and text in the code.</span><span class="ar">صُنِع بحبّ للقصص والخيال ✦ يمكنكِ تغيير الأسماء والأحداث والنصوص من داخل الكود.</span></footer>
 <script>
   const openBtn = document.getElementById('openBtn');
   const mailWrap = document.getElementById('mailWrap');
@@ -223,9 +229,9 @@
 
   openBtn.addEventListener('click', () => {
     mailWrap.classList.add('open');
-    openBtn.textContent = 'الرسالة فُتحت ✓';
+    openBtn.innerHTML = '<span class="en">Letter opened ✓</span><span class="ar">فُتحت الرسالة ✓</span>';
     openBtn.disabled = true;
-    hint.textContent = 'حكايتك بدأت...';
+    hint.innerHTML = '<span class="en">Your story has begun...</span><span class="ar">حكايتك بدأت...</span>';
     setTimeout(() => {
       mailStage.style.display = 'none';
       story.classList.add('visible');
@@ -237,9 +243,9 @@
     story.classList.remove('visible');
     mailStage.style.display = 'grid';
     mailWrap.classList.remove('open');
-    openBtn.textContent = 'افتحي الرسالة ✉';
+    openBtn.innerHTML = '<span class="en">Open the letter ✉</span><span class="ar">افتحي الرسالة ✉</span>';
     openBtn.disabled = false;
-    hint.textContent = 'هناك حكاية تنتظر أن تُفتَح';
+    hint.innerHTML = '<span class="en">A story is waiting to be opened</span><span class="ar">هناك حكاية تنتظر أن تُفتَح</span>';
     window.scrollTo({top:0,behavior:'smooth'});
   });
 
@@ -258,7 +264,7 @@
         group.querySelector('[data-correct="true"]').classList.add('correct');
       }
       document.getElementById('feedback').textContent =
-        isCorrect ? `إجابة صحيحة! ⭐ نتيجتك: ${score} من 2` : `مش مشكلة، اتعلمنا حاجة جديدة 💗 نتيجتك: ${score} من 2`;
+        isCorrect ? `<span class="en">Correct! ⭐ Your score: ${score} out of 2</span><br><span class="ar">إجابة صحيحة! ⭐ نتيجتك: ${score} من 2</span>` : `<span class="en">That’s okay—we learned something new 💗 Your score: ${score} out of 2</span><br><span class="ar">مش مشكلة، اتعلمنا حاجة جديدة 💗 نتيجتك: ${score} من 2</span>`;
     });
   });
 
@@ -273,7 +279,7 @@
   });
 
   document.getElementById('nextChapter').addEventListener('click', () => {
-    alert('سنضيف الفصل الثاني عندما تجهزين أحداثه 💌');
+    alert('Chapter Two will be added when its story is ready 💌\nسنضيف الفصل الثاني عندما تجهزين أحداثه 💌');
   });
 </script>
 </body>
