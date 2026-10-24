@@ -1,27 +1,280 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEM</title><style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090b;font-family:Arial,Tahoma,sans-serif}
-#intro{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#302b31,#07080a 75%);color:#fff}.box{text-align:center;padding:40px}h1{font-size:72px;letter-spacing:18px;margin:0 0 12px}p{opacity:.7;line-height:1.8;margin-bottom:28px}button{border:0;border-radius:30px;padding:16px 48px;font-size:18px;cursor:pointer;background:#eee7e5;color:#171518}button:active{transform:scale(.96)}
-#hud{position:fixed;top:18px;left:18px;z-index:10;color:white;background:#0006;padding:12px 16px;border-radius:12px;display:none}#cross{position:fixed;left:50%;top:50%;width:5px;height:5px;background:white;border-radius:50%;transform:translate(-50%,-50%);display:none;z-index:20}#status{position:fixed;left:50%;bottom:35px;transform:translateX(-50%);z-index:60;color:#fff;background:#000b;padding:12px 20px;border-radius:12px;display:none;text-align:center}
-</style></head><body>
-<div id="intro"><div class="box"><h1>MEM</h1><p>في البداية كان كل شيء طبيعيًا.<br>مجرد بيت... ومجرد فتاة اسمها Mem.</p><button id="start">ابدأ اللعبة</button></div></div>
-<div id="hud">W A S D للحركة — الماوس للنظر</div><div id="cross"></div><div id="status"></div>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رسائل بين الفصول | Story Mail</title>
+<style>
+  :root{
+    --ink:#29243a; --plum:#7d4d78; --rose:#f1b9cd; --cream:#fff8f1;
+    --paper:#fffdfb; --lav:#e8def7; --gold:#d8ad69; --muted:#766b7d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; color:var(--ink);
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,.9), transparent 28%),
+      radial-gradient(circle at 85% 80%, rgba(241,185,205,.38), transparent 30%),
+      linear-gradient(135deg,#f8eaf1,#eee8fb 52%,#fff6ed);
+  }
+  button{font:inherit; cursor:pointer}
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    max-width:1100px; margin:auto; padding:22px 22px 8px;
+  }
+  .brand{font-weight:800; letter-spacing:.3px; font-size:1.1rem}
+  .brand span{color:var(--plum)}
+  .tag{font-size:.85rem; color:var(--muted)}
+  main{max-width:1100px; margin:0 auto; padding:18px 22px 48px}
+  .intro{text-align:center; margin:20px auto 26px; max-width:650px}
+  .eyebrow{color:var(--plum); font-weight:700; font-size:.9rem; letter-spacing:1px}
+  h1{font-size:clamp(2rem,5vw,3.2rem); margin:10px 0; line-height:1.2}
+  .intro p{color:var(--muted); line-height:1.9; margin:0}
+  .mail-stage{
+    min-height:390px; display:grid; place-items:center; position:relative;
+    border:1px solid rgba(125,77,120,.16); border-radius:28px;
+    background:rgba(255,255,255,.42); overflow:hidden;
+    box-shadow:0 20px 60px rgba(76,48,84,.08);
+  }
+  .sparkle{position:absolute;color:#c28cae;font-size:1.4rem;animation:float 4s ease-in-out infinite}
+  .s1{top:15%;left:16%}.s2{top:25%;right:15%;animation-delay:1s}.s3{bottom:17%;left:25%;animation-delay:2s}
+  @keyframes float{50%{transform:translateY(-12px) rotate(12deg);opacity:.55}}
+  .mail-wrap{width:min(310px,78vw); height:220px; position:relative; margin-top:20px; filter:drop-shadow(0 18px 20px rgba(79,45,82,.18))}
+  .envelope{
+    position:absolute; bottom:0; width:100%; height:155px; border-radius:9px;
+    background:#dca7bd; overflow:hidden; border:1px solid rgba(91,47,82,.18);
+  }
+  .envelope:before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(145deg,transparent 49.5%,#c987a7 50%) left,
+               linear-gradient(215deg,transparent 49.5%,#e8bbcd 50%) right;
+    background-size:50% 100%; background-repeat:no-repeat;
+  }
+  .flap{
+    position:absolute; top:65px; left:0; width:100%; height:155px;
+    background:#f1c9d7; clip-path:polygon(0 0,100% 0,50% 72%);
+    transform-origin:top; transition:transform .75s ease; z-index:4;
+    border-top:1px solid rgba(91,47,82,.12);
+  }
+  .letter{
+    position:absolute; z-index:2; left:8%; width:84%; bottom:12px; height:180px;
+    background:var(--paper); border-radius:7px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:18px;
+    transition:transform .8s ease; border:1px solid #eadce6;
+  }
+  .letter .mini{font-size:.75rem;color:var(--plum);letter-spacing:1px}
+  .letter strong{font-family:Georgia,serif;font-size:1.3rem;margin:9px 0}
+  .seal{
+    position:absolute; z-index:5; left:calc(50% - 23px); top:125px; width:46px;height:46px;
+    border-radius:50%; display:grid;place-items:center;background:#9e557e;color:white;
+    border:3px solid #f7dce7; box-shadow:0 3px 10px #99567d55; transition:opacity .3s,transform .3s;
+  }
+  .open .flap{transform:rotateX(180deg); z-index:1}
+  .open .letter{transform:translateY(-115px); z-index:5}
+  .open .seal{opacity:0;transform:scale(.5)}
+  .primary,.secondary{
+    border:0;border-radius:999px;padding:13px 23px;font-weight:750;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .primary{background:var(--plum);color:white;box-shadow:0 8px 18px #7d4d7833}
+  .primary:hover,.secondary:hover{transform:translateY(-2px)}
+  .secondary{background:#fff;color:var(--plum);border:1px solid #e4c9dc}
+  .open-btn{position:absolute;bottom:22px;z-index:8}
+  .hint{position:absolute;bottom:76px;color:var(--muted);font-size:.88rem}
+  .story{display:none;margin-top:30px;animation:appear .5s ease}
+  .story.visible{display:block}
+  @keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .chapter-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .chapter-head h2{margin:0;font-size:clamp(1.6rem,4vw,2.2rem)}
+  .chapter-no{color:var(--plum);font-weight:800}
+  .story-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:20px;align-items:stretch}
+  .story-text,.illustration{border-radius:22px;border:1px solid #eadce9;background:rgba(255,253,251,.88);box-shadow:0 14px 35px #4e31510d}
+  .story-text{padding:clamp(20px,4vw,34px);line-height:2.05;font-size:1.04rem}
+  .story-text p{margin:0 0 16px}
+  .story-text p:last-child{margin-bottom:0}
+  .dropcap:first-letter{font-size:2.5rem;color:var(--plum);font-weight:800;float:right;line-height:1;margin-left:5px}
+  .illustration{min-height:320px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(180deg,#29243a 0%,#5a426e 48%,#d9a4bb 100%);color:white;padding:22px}
+  .moon{position:absolute;top:32px;left:35px;width:80px;height:80px;border-radius:50%;background:#ffe7c1;box-shadow:0 0 55px #ffdfb088}
+  .city{position:absolute;bottom:0;left:0;right:0;height:38%;display:flex;align-items:flex-end;gap:7px;padding:0 12px}
+  .city span{display:block;flex:1;background:#29243a;opacity:.82;border-radius:4px 4px 0 0}
+  .city span:nth-child(1){height:65%}.city span:nth-child(2){height:90%}.city span:nth-child(3){height:55%}
+  .city span:nth-child(4){height:100%}.city span:nth-child(5){height:72%}.city span:nth-child(6){height:83%}.city span:nth-child(7){height:48%}
+  .silhouette{position:absolute;bottom:20%;left:42%;width:62px;height:120px;z-index:2}
+  .silhouette:before{content:"";position:absolute;top:0;left:16px;width:32px;height:36px;border-radius:50%;background:#171526}
+  .silhouette:after{content:"";position:absolute;top:30px;left:2px;width:60px;height:92px;background:#171526;clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);border-radius:18px}
+  .caption{position:relative;z-index:4;background:#201b32bb;border:1px solid #ffffff44;border-radius:14px;padding:14px;backdrop-filter:blur(4px)}
+  .caption strong{display:block;font-size:1.1rem;margin-bottom:6px}
+  .caption small{color:#f7dce7;line-height:1.7}
+  .illustration-label{position:absolute;top:18px;right:18px;z-index:4;background:#ffffff24;border:1px solid #ffffff55;border-radius:999px;padding:7px 12px;font-size:.8rem}
+  .questions{margin-top:22px;padding:24px;border-radius:22px;background:#f8eef6;border:1px solid #ead6e7}
+  .questions h3{margin:0 0 12px}
+  .question{padding:14px 0;border-bottom:1px solid #e8d5e4}
+  .question:last-of-type{border-bottom:0}
+  .answers{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}
+  .answer{border:1px solid #d9bfd5;background:white;border-radius:12px;padding:9px 13px;color:var(--ink)}
+  .answer.correct{background:#e3f5e8;border-color:#7fb58e}
+  .answer.wrong{background:#ffe7e9;border-color:#d78b99}
+  .feedback{min-height:24px;color:var(--plum);font-weight:700;margin-top:10px}
+  .end-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px 10px 8px}
+  @media(max-width:720px){
+    .topbar{padding:18px 16px 5px}main{padding:12px 16px 32px}
+    .mail-stage{min-height:370px}.story-grid{grid-template-columns:1fr}
+    .illustration{min-height:300px;order:-1}.tag{display:none}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">✉ <span>Story Mail</span></div>
+  <div class="tag">كل رسالة تخبّئ حكاية</div>
+</header>
+<main>
+  <section class="intro">
+    <div class="eyebrow">A STORY WAITING FOR YOU</div>
+    <h1>رسالة من عالم آخر</h1>
+    <p>افتحي الظرف، اقرئي الفصل، واكتشفي الأسرار المخفية بين السطور.</p>
+  </section>
+
+  <section class="mail-stage" id="mailStage" aria-label="ظرف القصة">
+    <span class="sparkle s1">✦</span><span class="sparkle s2">✧</span><span class="sparkle s3">♡</span>
+    <div class="mail-wrap" id="mailWrap">
+      <div class="letter">
+        <span class="mini">PRIVATE STORY</span>
+        <strong>رسالة سرّية</strong>
+        <span>الفصل الأول ينتظركِ...</span>
+      </div>
+      <div class="envelope"></div>
+      <div class="flap"></div>
+      <div class="seal">✦</div>
+    </div>
+    <div class="hint" id="hint">هناك حكاية تنتظر أن تُفتَح</div>
+    <button class="primary open-btn" id="openBtn">افتحي الرسالة ✉</button>
+  </section>
+
+  <section class="story" id="story">
+    <div class="chapter-head">
+      <div>
+        <div class="chapter-no">CHAPTER 01</div>
+        <h2>النجمة التي أخفت سرّها</h2>
+      </div>
+      <button class="secondary" id="backBtn">↩ العودة إلى الظرف</button>
+    </div>
+    <div class="story-grid">
+      <article class="story-text">
+        <p class="dropcap">في مدينة لا تنام، كانت «آريا» أكثر نجمة يلمع اسمها على الشاشات. ابتسامتها تملأ الملصقات، وصوتها يجعل آلاف القلوب تخفق، لكن خلف الأضواء كانت تخفي سرًّا لم يعرفه أحد.</p>
+        <p>لم تكن آريا تعيش وحدها كما يظنّ جمهورها؛ فقد كانت متزوجة سرًّا، وكانت تحمي عائلتها من عيون الصحافة التي لا ترحم.</p>
+        <p>وفي ليلة ممطرة، وُلد توأمها: «رين» و«ميرا». لم يكونا طفلين عاديين؛ ففي أعماق روحيهما ذكريات حياة أخرى، ووجوهًا وأحداثًا لم يستطع أحد تفسيرها.</p>
+        <p>في تلك الحياة السابقة، كان رين طبيبًا شابًّا، وكانت ميرا فتاة تقاوم مرضًا قاسيًا. افترق الاثنان عن العالم قبل أن يحقّقا أحلامهما، لكن القدر منحهما بداية جديدة تحت سقف واحد.</p>
+        <p>مرّت السنوات، وصارت ضحكات التوأم أجمل ما في حياة آريا. ومع ذلك، كان هناك شخص يراقبها من بعيد، يرفض أن يتقبّل أن للنجمة حياة لا يملكها. لم تكن آريا تعلم أن سرّها أصبح في خطر.</p>
+        <p>وفي مساءٍ بدا عاديًّا، انطفأت الأضواء التي اعتادت أن تحيط بها. رحلت آريا، وتركت خلفها طفلين وبيتًا امتلأ بالصمت. لم يفهم رين كيف يمكن للعالم أن يصفّق لنجمة، ثم يتركها وحيدة حين تحتاج إلى الحماية.</p>
+        <p>منذ ذلك اليوم، تغيّر شيء في داخله. لم يعد يريد أن يعرف الحقيقة فقط؛ بل أراد أن يعيد أمه، مهما كان الثمن. وحين ظهرت فتاة ذكية اسمها «ليان»، قادرة على رؤية الأكاذيب التي لا يلاحظها الآخرون، قرّر رين الاقتراب منها.</p>
+        <p>كان يقول لنفسه إنه يحتاج إلى عقلها لا أكثر. لكنه لم ينتبه إلى أن بعض الأشخاص، حين يدخلون حياتنا كجزء من خطة، قد يصبحون الجزء الوحيد الذي لا نعرف كيف نخسره.</p>
+        <p><strong>وفي آخر الليل، ظهرت على مرآة رين كلمات لم يكتبها أحد:</strong><br>«إذا أردتَ استعادة ما فقدته، فابحث عن الحقيقة التي دُفنت مع النجمة.»</p>
+      </article>
+
+      <aside class="illustration" aria-label="رسم تخيلي للمشهد">
+        <span class="illustration-label">رسم تخيّلي للمشهد</span>
+        <div class="moon"></div>
+        <div class="silhouette"></div>
+        <div class="city"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="caption">
+          <strong>السرّ يبدأ خلف الأضواء...</strong>
+          <small>نجمة مشهورة، توأم يحملان ماضيًا غامضًا، وفتى لن يتراجع حتى يعرف الحقيقة.</small>
+        </div>
+      </aside>
+    </div>
+
+    <section class="questions">
+      <h3>🧠 اختبري انتباهكِ</h3>
+      <div class="question">
+        <strong>1. ما السر الذي كانت آريا تخفيه عن الجمهور؟</strong>
+        <div class="answers">
+          <button class="answer" data-correct="false">أنها ستترك الغناء</button>
+          <button class="answer" data-correct="true">أنها متزوجة ولديها عائلة</button>
+          <button class="answer" data-correct="false">أنها لا تحب الموسيقى</button>
+        </div>
+      </div>
+      <div class="question">
+        <strong>2. لماذا اقترب رين من ليان؟</strong>
+        <div class="answers">
+          <button class="answer" data-correct="true">لأنها ذكية ويمكنها مساعدته في كشف الحقيقة</button>
+          <button class="answer" data-correct="false">لأنها مديرة أعماله</button>
+          <button class="answer" data-correct="false">لأنها أخته</button>
+        </div>
+      </div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="end-actions">
+        <button class="primary" id="readAgain">قراءة الفصل مرة أخرى</button>
+        <button class="secondary" id="nextChapter">الفصل التالي قريبًا ♡</button>
+      </div>
+    </section>
+  </section>
+</main>
+<footer>صُنِع بحبّ للقصص والخيال ✦ يمكنكِ تغيير الأسماء والأحداث والنصوص من داخل الكود.</footer>
 <script>
-const intro=document.getElementById("intro"),start=document.getElementById("start"),statusBox=document.getElementById("status");
-function status(t){statusBox.textContent=t;statusBox.style.display="block"}
-start.onclick=async()=>{start.disabled=true;start.textContent="جاري التشغيل...";intro.style.display="none";document.getElementById("hud").style.display="block";document.getElementById("cross").style.display="block";try{await loadThree();build()}catch(e){console.error(e);status("الواجهة اشتغلت، لكن محرك 3D لم يتحمل. تأكدي من الإنترنت ثم أعيدي فتح الملف.")}};
-function loadThree(){return new Promise((ok,no)=>{if(window.THREE)return ok();let s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
-let scene,camera,renderer,yaw=0,pitch=0,locked=false;const keys={};
-function build(){
-scene=new THREE.Scene();scene.background=new THREE.Color(0x111216);scene.fog=new THREE.Fog(0x111216,8,45);
-camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.05,100);camera.position.set(0,1.65,8);
-renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xd9e5ff,0x30252a,2));let l=new THREE.DirectionalLight(0xffdfc2,2.5);l.position.set(-5,8,5);l.castShadow=true;scene.add(l);
-add(0,-.1,0,28,.2,28,0x6e5b52);add(0,4,-13,28,8,.3,0xc7beb8);add(-14,4,0,.3,8,26,0xc7beb8);add(14,4,0,.3,8,26,0xc7beb8);add(-5,4,-3,.25,8,8,0xc7beb8);add(5,4,-3,.25,8,8,0xc7beb8);add(0,4,2,10,8,.25,0xc7beb8);add(-6,1.3,7,5,1.4,2,0x4c5157);add(-6,2.5,6.2,5,2,.5,0x4c5157);add(0,.8,7,3,.25,1.7,0x563e34);
-renderer.domElement.onclick=()=>{if(document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock().catch(()=>{})};
-document.onpointerlockchange=()=>locked=document.pointerLockElement===renderer.domElement;
-document.onmousemove=e=>{if(!locked)return;yaw-=e.movementX*.002;pitch-=e.movementY*.002;pitch=Math.max(-1.3,Math.min(1.3,pitch))};requestAnimationFrame(loop)}
-function add(x,y,z,w,h,d,c){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.8}));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m)}
-document.onkeydown=e=>keys[e.key.toLowerCase()]=true;document.onkeyup=e=>keys[e.key.toLowerCase()]=false;
-let last=performance.now();function loop(){requestAnimationFrame(loop);let now=performance.now(),dt=Math.min((now-last)/1000,.05);last=now;let f=(keys.w?1:0)-(keys.s?1:0),s=(keys.d?1:0)-(keys.a?1:0);let d=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)),q=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));camera.position.addScaledVector(d,-f*4*dt);camera.position.addScaledVector(q,s*4*dt);camera.position.x=THREE.MathUtils.clamp(camera.position.x,-12.5,12.5);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-11.5,11.5);camera.position.y=1.65;camera.rotation.order="YXZ";camera.rotation.y=yaw;camera.rotation.x=pitch;renderer.render(scene,camera)}
-addEventListener("resize",()=>{if(!camera)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)})
-</script></body></html>
+  const openBtn = document.getElementById('openBtn');
+  const mailWrap = document.getElementById('mailWrap');
+  const mailStage = document.getElementById('mailStage');
+  const story = document.getElementById('story');
+  const hint = document.getElementById('hint');
+
+  openBtn.addEventListener('click', () => {
+    mailWrap.classList.add('open');
+    openBtn.textContent = 'الرسالة فُتحت ✓';
+    openBtn.disabled = true;
+    hint.textContent = 'حكايتك بدأت...';
+    setTimeout(() => {
+      mailStage.style.display = 'none';
+      story.classList.add('visible');
+      story.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 900);
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    story.classList.remove('visible');
+    mailStage.style.display = 'grid';
+    mailWrap.classList.remove('open');
+    openBtn.textContent = 'افتحي الرسالة ✉';
+    openBtn.disabled = false;
+    hint.textContent = 'هناك حكاية تنتظر أن تُفتَح';
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  let score = 0;
+  document.querySelectorAll('.answer').forEach(button => {
+    button.addEventListener('click', () => {
+      const group = button.closest('.question');
+      if (group.dataset.answered === 'true') return;
+      group.dataset.answered = 'true';
+      const isCorrect = button.dataset.correct === 'true';
+      if (isCorrect) {
+        score++;
+        button.classList.add('correct');
+      } else {
+        button.classList.add('wrong');
+        group.querySelector('[data-correct="true"]').classList.add('correct');
+      }
+      document.getElementById('feedback').textContent =
+        isCorrect ? `إجابة صحيحة! ⭐ نتيجتك: ${score} من 2` : `مش مشكلة، اتعلمنا حاجة جديدة 💗 نتيجتك: ${score} من 2`;
+    });
+  });
+
+  document.getElementById('readAgain').addEventListener('click', () => {
+    document.querySelectorAll('.question').forEach(q => {
+      delete q.dataset.answered;
+      q.querySelectorAll('.answer').forEach(a => a.classList.remove('correct','wrong'));
+    });
+    score = 0;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('backBtn').click();
+  });
+
+  document.getElementById('nextChapter').addEventListener('click', () => {
+    alert('سنضيف الفصل الثاني عندما تجهزين أحداثه 💌');
+  });
+</script>
+</body>
+</html>
